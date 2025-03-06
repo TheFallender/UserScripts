@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Itch.io Bundle Claim
 // @author       TheFallender
-// @version      1.5.2
+// @version      1.5.3
 // @description  This script will claim all the items in a bundle slowly, without sending too many requests to the website
 // @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/ItchioBundleClaim/ItchIoBundleClaim.user.js
@@ -19,10 +19,10 @@
     'use strict';
 
     //Wait time: Time to wait between changes.
-    //I really don't recommend changing this setting to a lower value
-    //as it will saturate Itch.io and probably give a headache to the
-    //owner.
-    const timeBetweenWaits = 1500;
+    //Let me suggest against changing this setting to a lower value as it
+    //will saturate Itch.io and probably give a headache to the owner,
+    //do not DDOS the site if just because you cannot wait. ty
+    const timeBetweenWaits = 2000;
 
     //Next button selector
     let nextButtonSelector = "a.next_page.button"
@@ -81,5 +81,5 @@
             //Inside an item page, go back to the bundle
             window.history.back();
         }
-    }, timeBetweenWaits);
+    }, timeBetweenWaits + Math.floor(Math.random() * 1001) - 500);
 })();
