@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.2.6
+// @version      1.2.7
 // @description  A script that hides the drops not interesting to the user
 // @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
@@ -15,27 +15,29 @@
 // ==/UserScript==
 
 (function () {
-    'use strict';
+    "use strict";
 
     // List selectors of drops and rewards
-    const dropsListSel = 'div.drops-root__content > div > div:has(>div.accordion-header h3.tw-title)';
-    const rewardsListSel = 'div.drops-root__content > div > div > div:has(>div.accordion-header h3.tw-title)';
+    const dropsListSel =
+        "div.drops-root__content > div > div:has(>div.accordion-header h3.tw-title)";
+    const rewardsListSel =
+        "div.drops-root__content > div > div > div:has(>div.accordion-header h3.tw-title)";
 
     // Selector of data of the drops/rewards
-    const dropsGameTitleSel = 'div.accordion-header h3.tw-title';
-    const rewardsCompanySel = 'div.accordion-header p[class*=CoreText]';
+    const dropsGameTitleSel = "div.accordion-header h3.tw-title";
+    const rewardsCompanySel = "div.accordion-header p[class*=CoreText]";
     const rewardsGameSel = 'a.tw-link[href*="/directory/category/"]';
 
     // Bloat on the drops
-    const bloatTextInfo = 'div.drops-root__content > div > div:has(> span)';
+    const bloatTextInfo = "div.drops-root__content > div > div:has(> span)";
 
     // Drops to always show
-    const dropsGamesToShow = [
+    const shownGames = [
         "33 Immortals",
+        "Apex Legends",
         "Assassin's Creed Shadows",
-		"Apex Legends",
-		"Baldur's Gate 3",
-		"BattleBit Remastered",
+        "Baldur's Gate 3",
+        "BattleBit Remastered",
         "Call of Duty: Black Ops 6",
         "Call of Duty: Warzone",
         "Cyberpunk 2077",
@@ -44,35 +46,36 @@
         "Diablo IV",
         "Don't Starve Together",
         "Enshrouded",
-		"Escape from Tarkov",
+        "Escape from Tarkov",
         "Escape from Tarkov: Arena",
         "FINAL FANTASY VII REBIRTH",
         "Ghosts of Tabor",
+        "Halo Infinite",
         "Halo: The Master Chief Collection",
-		"Halo Infinite",
         "HITMAN World of Assassination",
         "Hunt: Showdown 1896",
         "inZOI",
         "Kingdom Come: Deliverance II",
         "Last Epoch",
-		"Marauders",
+        "Marauders",
         "Marvel Rivals",
         "Nightingale",
         "No Man's Sky",
         "Palworld",
         "Path of Exile",
         "Path of Exile 2",
-		"PAYDAY 2",
+        "PAYDAY 2",
         "PAYDAY 3",
         "Pokémon GO",
-		"Rust",
-		"Sea of Thieves",
+        "PUBG: BATTLEGROUNDS",
+        "Rust",
+        "Sea of Thieves",
         "Special Events",
         "Splitgate",
         "Splitgate 2",
+        "THE FINALS",
         "Tom Clancy's Rainbow Six Siege",
         "Tom Clancy's The Division 2",
-        "THE FINALS",
         "Warhammer 40,000: Rogue Trader",
         "Warhammer 40,000: Space Marine II",
     ];
@@ -91,8 +94,8 @@
         "ASCENDANT.COM",
         "Assassin's Creed Mirage",
         "Assassin's Creed Odyssey",
-        "Assassin's Creed Valhalla",
         "Assassin's Creed Shadows",
+        "Assassin's Creed Valhalla",
         "Avatar: Frontiers of Pandora",
         "Baldur's Gate 3",
         "BAPBAP",
@@ -101,14 +104,16 @@
         "BattleBit Remastered",
         "BattleCore Arena",
         "Black Desert",
+        "Blade & Soul NEO",
         "Brawl Stars",
         "Brawlhalla",
         "Brazen Blaze",
         "BUMP! Superbrawl",
+        "Caliber",
         "Call of Duty: Black Ops 6",
         "Call of Duty: Warzone",
-        "Caliber",
         "Cards of Eternity: The Wheel of Time",
+        "ChatTDT: Tower Defense Twitch",
         "Chess",
         "Clash of Clans",
         "Coin Pusher World",
@@ -124,12 +129,12 @@
         "DC Dual Force",
         "Dead by Daylight",
         "Dead Island 2",
-        "Delta Force",
-        "Diabotical Rogue",
         "Deathbound",
         "Deceive Inc.",
+        "Delta Force",
         "Destiny 2",
         "Diablo IV",
+        "Diabotical Rogue",
         "Disney Speedstorm",
         "Dofus",
         "DOFUS Touch",
@@ -169,8 +174,8 @@
         "Freestyle Football R",
         "From Space",
         "Genshin Impact",
-        "Ghosts of Tabor",
         "Ghostbusters: Spirits Unleashed",
+        "Ghosts of Tabor",
         "Go Go Muffin",
         "GODDESS OF VICTORY: NIKKE",
         "Goose Goose Duck",
@@ -180,22 +185,23 @@
         "Guild Wars 2",
         "Gundam Evolution",
         "Gwent: The Witcher Card Game",
-        "HAWKED",
-        "Homeworld 3",
-        "HUMANKIND",
-        "HYENAS",
-        "Halo: The Master Chief Collection",
         "Halo Infinite",
+        "Halo: The Master Chief Collection",
+        "HAWKED",
         "Hearthstone",
         "Hellcard",
         "HITMAN World of Assassination",
+        "Homeworld 3",
         "Honkai Impact 3rd",
         "Honkai: Star Rail",
         "Honor of Kings",
         "House Flipper 2",
+        "HUMANKIND",
         "Hunt: Showdown 1896",
+        "HYENAS",
         "Infestation: The New Beginning",
         "Infestation: The New Z",
+        "Infinity Nikki",
         "inZOI",
         "Kakele Online: MMORPG",
         "KartRider: Drift",
@@ -239,32 +245,30 @@
         "My Hero Ultra Rumble",
         "My Time at Sandrock",
         "Myth of Empires",
-        "NW2Online",
         "NARAKA: BLADEPOINT",
         "NBA 2K24",
         "NBA 2K25",
+        "Neighbors: Suburban Warfare",
         "Neon Abyss: Infinity",
-        "NextWorld2",
         "New World",
         "New World: Aeternum",
+        "NextWorld2",
         "Nightingale",
         "Ninja Must Die",
         "Nitro: Stream Racing",
         "No Man's Sky",
+        "NW2Online",
         "Off The Grid",
         "Oh Baby! Kart",
         "Once Human",
         "One Punch Man: World",
         "Operation Valor",
-        "OUTERPLANE",
-        "OutRage: Fight Fest",
         "Out of the Park Baseball 24",
         "Out of the Park Baseball 25",
         "Out of the Park Baseball 26",
+        "OUTERPLANE",
+        "OutRage: Fight Fest",
         "Overwatch 2",
-        "PAYDAY 2",
-        "PAYDAY 3",
-        "PUBG: BATTLEGROUNDS",
         "Paladins",
         "Palia",
         "Palworld",
@@ -272,6 +276,8 @@
         "Party Animals",
         "Path of Exile",
         "Path of Exile 2",
+        "PAYDAY 2",
+        "PAYDAY 3",
         "Planet Coaster 2",
         "Pokémon GO",
         "Pokémon Trading Card Game",
@@ -279,14 +285,16 @@
         "Pokémon UNITE",
         "Portal Fantasy",
         "Predecessor",
-        "Project: Arena",
         "Project ETHOS",
         "Project F4E",
         "Project Genesis",
         "Project Winter",
+        "Project: Arena",
+        "PUBG Mobile",
+        "PUBG: BATTLEGROUNDS",
         "Race Day Rampage",
-        "RavenQuest",
         "Ravendawn",
+        "RavenQuest",
         "Rawmen",
         "Relic Hunters Legend",
         "Rennsport",
@@ -297,23 +305,21 @@
         "Rumble Club",
         "Rush Royale",
         "Rust",
-        "SMITE",
-        "SMITE 2",
-        "Somnis: Rumble Rush",
-        "STALCRAFT",
-        "SYNCED",
+        "S.K.I.L.L.: Special Force 2",
         "Sea of Thieves",
         "Seekers of Skyveil",
         "Shakes and Fidget",
         "Shatterline",
         "Shell Shockers",
         "Sid Meier's Civilization VII",
-        "S.K.I.L.L.: Special Force 2",
         "Skull and Bones",
         "Sky: Children of the Light",
         "Slapshot Rebound",
         "Slipstream: Rogue Space",
+        "SMITE",
+        "SMITE 2",
         "Snowbreak: Containment Zone",
+        "Somnis: Rumble Rush",
         "Soulmask",
         "Special Events",
         "Spectre Divide",
@@ -321,11 +327,14 @@
         "Splitgate",
         "Splitgate 2",
         "Squad Busters",
-        "Stampede Racing Royale",
+        "STALCRAFT",
         "STALCRAFT: X",
-        "Starsiege: Deadzone",
+        "Stampede Racing Royale",
+        "Standoff 2",
         "Star Wars Outlaws",
         "Star Wars: The Old Republic",
+        "Starsiege: Deadzone",
+        "Steel Hunters",
         "Stormgate",
         "Stream Raiders",
         "Strinova",
@@ -335,9 +344,11 @@
         "Super Animal Royale",
         "Superball",
         "SUPERVIVE",
+        "SYNCED",
         "Tanki Online",
         "Tarisland",
         "Teamfight Tactics",
+        "Terminull Brigade",
         "TerraTech Worlds",
         "The Bornless",
         "The Crew: Motorfest",
@@ -355,14 +366,14 @@
         "Torchlight: Infinite",
         "Tower of Fantasy",
         "TRIBES 3: Rivals",
-        "Trust No Bunny",
         "Trove",
+        "Trust No Bunny",
         "Two Point Museum",
         "UFL",
         "Umamusume: Pretty Derby",
-        "Undying",
         "UNDAWN",
         "UNDECEMBER",
+        "Undying",
         "UNITED 1944",
         "Unrooted",
         "VALORANT",
@@ -370,8 +381,6 @@
         "Vaultbreakers",
         "Veiled Experts",
         "Venatur",
-        "WWE 2K25",
-        "WWE SuperCard",
         "Wakfu",
         "War Robots: Frontiers",
         "War Thunder",
@@ -380,7 +389,6 @@
         "Warface",
         "Warface: Clutch",
         "Warframe",
-        "Warhammer: The Horus Heresy - Legions",
         "Warhammer 40,000: Darktide",
         "Warhammer 40,000: Rogue Trader",
         "Warhammer 40,000: Space Marine II",
@@ -388,8 +396,10 @@
         "Warhammer 40,000: Warpforge",
         "Warhammer Age of Sigmar: Realms of Ruin",
         "Warhammer Online: Age of Reckoning",
+        "Warhammer: The Horus Heresy - Legions",
         "Warhaven",
         "West Hunt",
+        "Wild Assault",
         "With Your Destiny",
         "World of Tanks",
         "World of Tanks Console",
@@ -397,45 +407,48 @@
         "World of Warships",
         "World War Z: Aftermath",
         "Wuthering Waves",
-        "XERA: Survival",
+        "WWE 2K25",
+        "WWE SuperCard",
         "XDefiant",
+        "XERA: Survival",
         "Zenless Zone Zero",
         "Zombie Within",
     ];
 
-    const rewardsCompaniesToShow = [
+    const shownCompanyRewards = [
         "PC Game Pass",
         "Rust",
-    ]
+    ];
 
-    const rewardsCompanies = [
+    const companyRewards = [
         "Apple TV+",
         "Discord",
         "PC Game Pass",
         "Rust",
         "Taco Bell",
         "Wuthering Waves",
-    ]
+    ];
 
-    const rewardsGamesToShow = [
+    const shownGameRewards = [
         "Minecraft",
         "Monster Hunter Wilds",
-    ]
+    ];
 
-    const rewardsGames = [
+    const gameRewards = [
         "Fallout 76",
         "FINAL FANTASY XIV ONLINE",
         "Harry Potter: Quidditch Champions",
         "Minecraft",
         "Monster Hunter Wilds",
+        "Pokémon UNITE",
         "Street Fighter 6",
         "World of Warcraft",
         "XDefiant",
-    ]
+    ];
 
     //Method to wait for an element in the DOM
     function waitForElement(selector, selectorAll = false) {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             //Return the element if it is already in the DOM
             if (!selectorAll) {
                 const element = document.querySelector(selector);
@@ -450,7 +463,7 @@
             }
 
             //Wait for the element to be in the DOM
-            const observer = new MutationObserver(mutations => {
+            const observer = new MutationObserver((mutations) => {
                 if (!selectorAll) {
                     const element = document.querySelector(selector);
                     if (element) {
@@ -469,16 +482,16 @@
             //Observer settings
             observer.observe(document.body, {
                 childList: true,
-                subtree: true
+                subtree: true,
             });
         });
     }
 
     //Remove the side nav bloat
-    function removeDrops () {
+    function removeDrops() {
         let oldHref = "";
         const body = document.querySelector("body");
-        const observer = new MutationObserver(mutations => {
+        const observer = new MutationObserver((mutations) => {
             mutations.forEach(() => {
                 if (oldHref !== document.location.href) {
                     oldHref = document.location.href;
@@ -497,16 +510,19 @@
                         waitForElement(dropsListSel, true).then((element) => {
                             Array.from(element).forEach((drop) => {
                                 // Extract the names
-                                const dropGame = drop.querySelector(dropsGameTitleSel)?.innerText;
+                                const dropGame =
+                                    drop.querySelector(
+                                        dropsGameTitleSel
+                                    )?.innerText;
 
                                 // Drops to show
-                                if (dropsGamesToShow.includes(dropGame)) {
+                                if (shownGames.includes(dropGame)) {
                                     return;
                                 }
 
                                 // Drops to remove
                                 if (dropsGames.includes(dropGame)) {
-                                    drop.remove()
+                                    drop.remove();
                                 }
                             });
                         });
@@ -515,21 +531,31 @@
                         waitForElement(rewardsListSel, true).then((element) => {
                             Array.from(element).forEach((drop) => {
                                 // Extract the names
-                                const rewardCompany = drop.querySelector(rewardsCompanySel)?.innerText;
-                                const rewardGame = drop.querySelector(rewardsGameSel)?.innerText;
+                                const rewardCompany =
+                                    drop.querySelector(
+                                        rewardsCompanySel
+                                    )?.innerText;
+                                const rewardGame =
+                                    drop.querySelector(
+                                        rewardsGameSel
+                                    )?.innerText;
 
                                 // Drops to show
-                                if (rewardsCompaniesToShow.includes(rewardCompany) ||
-                                    rewardsGamesToShow.includes(rewardGame)
-                                ){
+                                if (
+                                    shownCompanyRewards.includes(
+                                        rewardCompany
+                                    ) ||
+                                    shownGameRewards.includes(rewardGame)
+                                ) {
                                     return;
                                 }
 
                                 // Drops to remove
-                                if (rewardsCompanies.includes(rewardCompany) ||
-                                    rewardsGames.includes(rewardGame)
-                                ){
-                                    drop.remove()
+                                if (
+                                    companyRewards.includes(rewardCompany) ||
+                                    gameRewards.includes(rewardGame)
+                                ) {
+                                    drop.remove();
                                 }
                             });
                         });
