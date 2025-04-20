@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.2.7
+// @version      1.2.8
 // @description  A script that hides the drops not interesting to the user
 // @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
@@ -18,18 +18,15 @@
     "use strict";
 
     // List selectors of drops and rewards
-    const dropsListSel =
-        "div.drops-root__content > div > div:has(>div.accordion-header h3.tw-title)";
-    const rewardsListSel =
-        "div.drops-root__content > div > div > div:has(>div.accordion-header h3.tw-title)";
+    const dropsListSel = ".drops-root__content div:has(> .accordion-header)";
+    const rewardsSpecificSel = '.tw-link[href*="/directory/category/"]';
 
     // Selector of data of the drops/rewards
-    const dropsGameTitleSel = "div.accordion-header h3.tw-title";
-    const rewardsCompanySel = "div.accordion-header p[class*=CoreText]";
-    const rewardsGameSel = 'a.tw-link[href*="/directory/category/"]';
+    const titleSelector = ".accordion-header .tw-title";
+    const rewardGameSelector = ".accordion-header .tw-title ~ p";
 
     // Bloat on the drops
-    const bloatTextInfo = "div.drops-root__content > div > div:has(> span)";
+    const bloatText = ".drops-root__content > div >div:has(span > .tw-link)";
 
     // Drops to always show
     const shownGames = [
@@ -42,6 +39,7 @@
         "Call of Duty: Warzone",
         "Cyberpunk 2077",
         "Dark and Darker",
+        "Delta Force",
         "Destiny 2",
         "Diablo IV",
         "Don't Starve Together",
@@ -49,6 +47,7 @@
         "Escape from Tarkov",
         "Escape from Tarkov: Arena",
         "FINAL FANTASY VII REBIRTH",
+        "Fortnite",
         "Ghosts of Tabor",
         "Halo Infinite",
         "Halo: The Master Chief Collection",
@@ -279,6 +278,7 @@
         "PAYDAY 2",
         "PAYDAY 3",
         "Planet Coaster 2",
+        "PGA TOUR 2K25",
         "Pokémon GO",
         "Pokémon Trading Card Game",
         "Pokémon Trading Card Game Live",
@@ -500,62 +500,81 @@
                         // missing drops of new games.
 
                         // Bloat
-                        waitForElement(bloatTextInfo, true).then((element) => {
-                            Array.from(element).forEach((bloat) => {
-                                bloat.remove();
+                        waitForElement(bloatText, true).then((bloat) => {
+                            bloat.forEach((element) => {
+                                element.remove();
                             });
                         });
 
                         //Wait for the Drops
                         waitForElement(dropsListSel, true).then((element) => {
-                            Array.from(element).forEach((drop) => {
-                                // Extract the names
-                                const dropGame =
-                                    drop.querySelector(
-                                        dropsGameTitleSel
+                            let games = [];
+                            let rewards = [];
+
+                            // Extract the data
+                            Array.from(element).forEach((dropElement) => {
+                                // Get the title of the drop
+                                const rewardCompany =
+                                    dropElement.querySelector(
+                                        rewardsSpecificSel
                                     )?.innerText;
-
-                                // Drops to show
-                                if (shownGames.includes(dropGame)) {
-                                    return;
-                                }
-
-                                // Drops to remove
-                                if (dropsGames.includes(dropGame)) {
-                                    drop.remove();
+                                if (rewardCompany !== undefined) {
+                                    const game =
+                                        dropElement.querySelector(
+                                            rewardGameSelector
+                                        )?.innerText;
+                                    rewards.push([
+                                        dropElement,
+                                        game,
+                                        rewardCompany,
+                                    ]);
+                                } else {
+                                    const title =
+                                        dropElement.querySelector(
+                                            titleSelector
+                                        )?.innerText;
+                                    games.push([dropElement, title]);
                                 }
                             });
-                        });
 
-                        //Wait for the Reward campaigns
-                        waitForElement(rewardsListSel, true).then((element) => {
-                            Array.from(element).forEach((drop) => {
-                                // Extract the names
-                                const rewardCompany =
-                                    drop.querySelector(
-                                        rewardsCompanySel
-                                    )?.innerText;
-                                const rewardGame =
-                                    drop.querySelector(
-                                        rewardsGameSel
-                                    )?.innerText;
+                            // Remove drops for games
+                            games.forEach((game) => {
+                                // Unpack
+                                const element = game[0];
+                                const title = game[1];
 
                                 // Drops to show
-                                if (
-                                    shownCompanyRewards.includes(
-                                        rewardCompany
-                                    ) ||
-                                    shownGameRewards.includes(rewardGame)
-                                ) {
+                                if (shownGames.includes(title)) {
+                                    return;
+                                }
+
+                                // Drops to remove
+                                if (dropsGames.includes(title)) {
+                                    element.remove();
+                                }
+                            });
+
+                            // Remove drops for rewards
+                            rewards.forEach((reward) => {
+                                // Unpack
+                                const element = reward[0];
+                                const game = reward[1];
+                                const company = reward[2];
+
+                                if (shownCompanyRewards.includes(company)) {
+                                    return;
+                                }
+
+                                if (shownGameRewards.includes(game)) {
                                     return;
                                 }
 
                                 // Drops to remove
                                 if (
-                                    companyRewards.includes(rewardCompany) ||
-                                    gameRewards.includes(rewardGame)
+                                    companyRewards.includes(company) ||
+                                    gameRewards.includes(game)
                                 ) {
-                                    drop.remove();
+                                    element.remove();
                                 }
                             });
                         });
