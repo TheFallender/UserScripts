@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.2.8
+// @version      1.3.0
 // @description  A script that hides the drops not interesting to the user
 // @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
@@ -11,579 +11,512 @@
 // @icon         https://www.google.com/s2/favicons?domain=twitch.tv
 // @license      MIT
 // @copyright    Copyright © 2024 TheFallender
-// @grant        none
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_registerMenuCommand
+// @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
 // ==/UserScript==
 
 (function () {
-    "use strict";
+	"use strict";
 
-    // List selectors of drops and rewards
-    const dropsListSel = ".drops-root__content div:has(> .accordion-header)";
-    const rewardsSpecificSel = '.tw-link[href*="/directory/category/"]';
+	// List selectors of drops and rewards
+	const dropsListSel = ".drops-root__content div:has(> .accordion-header)";
+	const rewardsSpecificSel = '.tw-link[href*="/directory/category/"]';
 
-    // Selector of data of the drops/rewards
-    const titleSelector = ".accordion-header .tw-title";
-    const rewardGameSelector = ".accordion-header .tw-title ~ p";
+	// Selector of data of the drops/rewards
+	const titleSelector = ".accordion-header .tw-title";
+	const rewardCompanySelector = ".accordion-header .tw-title ~ p";
 
-    // Bloat on the drops
-    const bloatText = ".drops-root__content > div >div:has(span > .tw-link)";
+	// Bloat on the drops
+	const bloatText = ".drops-root__content > div >div:has(span > .tw-link)";
 
-    // Drops to always show
-    const shownGames = [
-        "33 Immortals",
-        "Apex Legends",
-        "Assassin's Creed Shadows",
-        "Baldur's Gate 3",
-        "BattleBit Remastered",
-        "Call of Duty: Black Ops 6",
-        "Call of Duty: Warzone",
-        "Cyberpunk 2077",
-        "Dark and Darker",
-        "Delta Force",
-        "Destiny 2",
-        "Diablo IV",
-        "Don't Starve Together",
-        "Enshrouded",
-        "Escape from Tarkov",
-        "Escape from Tarkov: Arena",
-        "FINAL FANTASY VII REBIRTH",
-        "Fortnite",
-        "Ghosts of Tabor",
-        "Halo Infinite",
-        "Halo: The Master Chief Collection",
-        "HITMAN World of Assassination",
-        "Hunt: Showdown 1896",
-        "inZOI",
-        "Kingdom Come: Deliverance II",
-        "Last Epoch",
-        "Marauders",
-        "Marvel Rivals",
-        "Nightingale",
-        "No Man's Sky",
-        "Palworld",
-        "Path of Exile",
-        "Path of Exile 2",
-        "PAYDAY 2",
-        "PAYDAY 3",
-        "Pokémon GO",
-        "PUBG: BATTLEGROUNDS",
-        "Rust",
-        "Sea of Thieves",
-        "Special Events",
-        "Splitgate",
-        "Splitgate 2",
-        "THE FINALS",
-        "Tom Clancy's Rainbow Six Siege",
-        "Tom Clancy's The Division 2",
-        "Warhammer 40,000: Rogue Trader",
-        "Warhammer 40,000: Space Marine II",
-    ];
+	//Method to wait for an element in the DOM
+	function waitForElement(selector, selectorAll = false) {
+		return new Promise((resolve) => {
+			//Return the element if it is already in the DOM
+			if (!selectorAll) {
+				const element = document.querySelector(selector);
+				if (element) {
+					resolve(element);
+				}
+			} else {
+				const element = document.querySelectorAll(selector);
+				if (element.length > 0) {
+					resolve(element);
+				}
+			}
 
-    // Which drops to hide
-    const dropsGames = [
-        "33 Immortals",
-        "Aether Gazer",
-        "AK-xolotl",
-        "Albion Online",
-        "Apex Legends",
-        "Arcane",
-        "ArcheAge",
-        "Arena Breakout",
-        "Arena Breakout: Infinite",
-        "ASCENDANT.COM",
-        "Assassin's Creed Mirage",
-        "Assassin's Creed Odyssey",
-        "Assassin's Creed Shadows",
-        "Assassin's Creed Valhalla",
-        "Avatar: Frontiers of Pandora",
-        "Baldur's Gate 3",
-        "BAPBAP",
-        "BATTLE CRUSH",
-        "Battle Teams 2",
-        "BattleBit Remastered",
-        "BattleCore Arena",
-        "Black Desert",
-        "Blade & Soul NEO",
-        "Brawl Stars",
-        "Brawlhalla",
-        "Brazen Blaze",
-        "BUMP! Superbrawl",
-        "Caliber",
-        "Call of Duty: Black Ops 6",
-        "Call of Duty: Warzone",
-        "Cards of Eternity: The Wheel of Time",
-        "ChatTDT: Tower Defense Twitch",
-        "Chess",
-        "Clash of Clans",
-        "Coin Pusher World",
-        "Conan Exiles",
-        "Conqueror's Blade",
-        "Coryphaeus Championships",
-        "Crossfire",
-        "Crossout",
-        "Cult of the Lamb",
-        "Cyberpunk 2077",
-        "Dark and Darker",
-        "Dark and Darker Mobile",
-        "DC Dual Force",
-        "Dead by Daylight",
-        "Dead Island 2",
-        "Deathbound",
-        "Deceive Inc.",
-        "Delta Force",
-        "Destiny 2",
-        "Diablo IV",
-        "Diabotical Rogue",
-        "Disney Speedstorm",
-        "Dofus",
-        "DOFUS Touch",
-        "Don't Starve Together",
-        "Dragonheir: Silent Gods",
-        "Dungeon Defenders II",
-        "Dungeon Fighter Online",
-        "Dungeon of the Endless",
-        "Dungeonborne",
-        "Dying Light 2: Stay Human",
-        "Dysterra",
-        "EA Sports College Football 25",
-        "EA Sports FC 24",
-        "EA Sports FC 25",
-        "EA Sports Madden NFL 25",
-        "Eco",
-        "Elite: Dangerous",
-        "Embervale.TV",
-        "Endless Dungeon",
-        "Enshrouded",
-        "Epic Seven",
-        "Escape from Tarkov",
-        "Escape from Tarkov: Arena",
-        "Eternal Return",
-        "EVE Online",
-        "Evilmun Family",
-        "Expeditions: A MudRunner Game",
-        "F4E: Extraction",
-        "Fall Guys",
-        "Farlight 84",
-        "FIFA 23",
-        "FINAL FANTASY VII REBIRTH",
-        "Fishing Planet",
-        "For Honor",
-        "Fortnite",
-        "FragPunk",
-        "Freestyle Football R",
-        "From Space",
-        "Genshin Impact",
-        "Ghostbusters: Spirits Unleashed",
-        "Ghosts of Tabor",
-        "Go Go Muffin",
-        "GODDESS OF VICTORY: NIKKE",
-        "Goose Goose Duck",
-        "Gord",
-        "Guardian Tales",
-        "Guessr.tv",
-        "Guild Wars 2",
-        "Gundam Evolution",
-        "Gwent: The Witcher Card Game",
-        "Halo Infinite",
-        "Halo: The Master Chief Collection",
-        "HAWKED",
-        "Hearthstone",
-        "Hellcard",
-        "HITMAN World of Assassination",
-        "Homeworld 3",
-        "Honkai Impact 3rd",
-        "Honkai: Star Rail",
-        "Honor of Kings",
-        "House Flipper 2",
-        "HUMANKIND",
-        "Hunt: Showdown 1896",
-        "HYENAS",
-        "Infestation: The New Beginning",
-        "Infestation: The New Z",
-        "Infinity Nikki",
-        "inZOI",
-        "Kakele Online: MMORPG",
-        "KartRider: Drift",
-        "Kewlbiverse",
-        "Killer Klowns from Outer Space: The Game",
-        "King of the Castle",
-        "Kingdom Come: Deliverance II",
-        "Kirka.io",
-        "Last Epoch",
-        "League of Legends",
-        "Legion TD 2",
-        "Level Zero: Extraction",
-        "Lineage II",
-        "Lost Ark",
-        "Lost Light",
-        "Lynked: Banner of the Spark",
-        "Madden NFL 24",
-        "Madden NFL 25",
-        "Mafiathon 2",
-        "Marauders",
-        "Marbles on Stream",
-        "MARVEL Contest of Champions",
-        "Marvel Rivals",
-        "Marvel Snap",
-        "MARVEL Strike Force",
-        "Mecha BREAK",
-        "Metin2",
-        "Mini Royale",
-        "Mir Korabley",
-        "Mir Tankov",
-        "MLB The Show 23",
-        "MLB The Show 24",
-        "MLB The Show 25",
-        "Modern Warships",
-        "MONOPOLY",
-        "Mortal Kombat 1",
-        "Mortal Online 2",
-        "Mother Machine",
-        "MultiVersus",
-        "My Candy Love",
-        "My Hero Ultra Rumble",
-        "My Time at Sandrock",
-        "Myth of Empires",
-        "NARAKA: BLADEPOINT",
-        "NBA 2K24",
-        "NBA 2K25",
-        "Neighbors: Suburban Warfare",
-        "Neon Abyss: Infinity",
-        "New World",
-        "New World: Aeternum",
-        "NextWorld2",
-        "Nightingale",
-        "Ninja Must Die",
-        "Nitro: Stream Racing",
-        "No Man's Sky",
-        "NW2Online",
-        "Off The Grid",
-        "Oh Baby! Kart",
-        "Once Human",
-        "One Punch Man: World",
-        "Operation Valor",
-        "Out of the Park Baseball 24",
-        "Out of the Park Baseball 25",
-        "Out of the Park Baseball 26",
-        "OUTERPLANE",
-        "OutRage: Fight Fest",
-        "Overwatch 2",
-        "Paladins",
-        "Palia",
-        "Palworld",
-        "Parallel",
-        "Party Animals",
-        "Path of Exile",
-        "Path of Exile 2",
-        "PAYDAY 2",
-        "PAYDAY 3",
-        "Planet Coaster 2",
-        "PGA TOUR 2K25",
-        "Pokémon GO",
-        "Pokémon Trading Card Game",
-        "Pokémon Trading Card Game Live",
-        "Pokémon UNITE",
-        "Portal Fantasy",
-        "Predecessor",
-        "Project ETHOS",
-        "Project F4E",
-        "Project Genesis",
-        "Project Winter",
-        "Project: Arena",
-        "PUBG Mobile",
-        "PUBG: BATTLEGROUNDS",
-        "Race Day Rampage",
-        "Ravendawn",
-        "RavenQuest",
-        "Rawmen",
-        "Relic Hunters Legend",
-        "Rennsport",
-        "Riders Republic",
-        "Rise Online",
-        "Rivals of Aether II",
-        "Rocket League",
-        "Rumble Club",
-        "Rush Royale",
-        "Rust",
-        "S.K.I.L.L.: Special Force 2",
-        "Sea of Thieves",
-        "Seekers of Skyveil",
-        "Shakes and Fidget",
-        "Shatterline",
-        "Shell Shockers",
-        "Sid Meier's Civilization VII",
-        "Skull and Bones",
-        "Sky: Children of the Light",
-        "Slapshot Rebound",
-        "Slipstream: Rogue Space",
-        "SMITE",
-        "SMITE 2",
-        "Snowbreak: Containment Zone",
-        "Somnis: Rumble Rush",
-        "Soulmask",
-        "Special Events",
-        "Spectre Divide",
-        "Spellborne",
-        "Splitgate",
-        "Splitgate 2",
-        "Squad Busters",
-        "STALCRAFT",
-        "STALCRAFT: X",
-        "Stampede Racing Royale",
-        "Standoff 2",
-        "Star Wars Outlaws",
-        "Star Wars: The Old Republic",
-        "Starsiege: Deadzone",
-        "Steel Hunters",
-        "Stormgate",
-        "Stream Raiders",
-        "Strinova",
-        "Stumble Guys",
-        "Suicide Squad: Kill the Justice League",
-        "Summoners War: Chronicles",
-        "Super Animal Royale",
-        "Superball",
-        "SUPERVIVE",
-        "SYNCED",
-        "Tanki Online",
-        "Tarisland",
-        "Teamfight Tactics",
-        "Terminull Brigade",
-        "TerraTech Worlds",
-        "The Bornless",
-        "The Crew: Motorfest",
-        "The Elder Scrolls Online",
-        "THE FINALS",
-        "The First Berserker: Khazan",
-        "The First Descendant",
-        "The Hidden Ones",
-        "The Settlers: New Allies",
-        "The Tomorrow Children",
-        "Throne and Liberty",
-        "Tom Clancy's Rainbow Six Siege",
-        "Tom Clancy's The Division 2",
-        "TopSpin 2K25",
-        "Torchlight: Infinite",
-        "Tower of Fantasy",
-        "TRIBES 3: Rivals",
-        "Trove",
-        "Trust No Bunny",
-        "Two Point Museum",
-        "UFL",
-        "Umamusume: Pretty Derby",
-        "UNDAWN",
-        "UNDECEMBER",
-        "Undying",
-        "UNITED 1944",
-        "Unrooted",
-        "VALORANT",
-        "Vampire: The Masquerade - Bloodhunt",
-        "Vaultbreakers",
-        "Veiled Experts",
-        "Venatur",
-        "Wakfu",
-        "War Robots: Frontiers",
-        "War Thunder",
-        "Warborne: Above Ashes",
-        "Warcraft Rumble",
-        "Warface",
-        "Warface: Clutch",
-        "Warframe",
-        "Warhammer 40,000: Darktide",
-        "Warhammer 40,000: Rogue Trader",
-        "Warhammer 40,000: Space Marine II",
-        "Warhammer 40,000: Speed Freeks",
-        "Warhammer 40,000: Warpforge",
-        "Warhammer Age of Sigmar: Realms of Ruin",
-        "Warhammer Online: Age of Reckoning",
-        "Warhammer: The Horus Heresy - Legions",
-        "Warhaven",
-        "West Hunt",
-        "Wild Assault",
-        "With Your Destiny",
-        "World of Tanks",
-        "World of Tanks Console",
-        "World of Warcraft",
-        "World of Warships",
-        "World War Z: Aftermath",
-        "Wuthering Waves",
-        "WWE 2K25",
-        "WWE SuperCard",
-        "XDefiant",
-        "XERA: Survival",
-        "Zenless Zone Zero",
-        "Zombie Within",
-    ];
+			//Wait for the element to be in the DOM
+			const observer = new MutationObserver((mutations) => {
+				if (!selectorAll) {
+					const element = document.querySelector(selector);
+					if (element) {
+						resolve(element);
+						observer.disconnect();
+					}
+				} else {
+					const element = document.querySelectorAll(selector);
+					if (element.length > 0) {
+						resolve(element);
+						observer.disconnect();
+					}
+				}
+			});
 
-    const shownCompanyRewards = [
-        "PC Game Pass",
-        "Rust",
-    ];
+			//Observer settings
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+			});
+		});
+	}
 
-    const companyRewards = [
-        "Apple TV+",
-        "Discord",
-        "PC Game Pass",
-        "Rust",
-        "Taco Bell",
-        "Wuthering Waves",
-    ];
+	// Helper function to create a column
+	function createColumn(doc, title) {
+		const column = doc.createElement("column");
+		Object.assign(column.style, {
+			flex: "1",
+			padding: "10px",
+			border: "1px solid #ddd",
+			borderRadius: "5px",
+			backgroundColor: "#f9f9f9",
+		});
 
-    const shownGameRewards = [
-        "Minecraft",
-        "Monster Hunter Wilds",
-    ];
+		const header = doc.createElement("h3");
+		Object.assign(header.style, {
+			marginTop: "0",
+			paddingBottom: "8px",
+			borderBottom: "1px solid #eee",
+		});
+		header.textContent = title;
 
-    const gameRewards = [
-        "Fallout 76",
-        "FINAL FANTASY XIV ONLINE",
-        "Harry Potter: Quidditch Champions",
-        "Minecraft",
-        "Monster Hunter Wilds",
-        "Pokémon UNITE",
-        "Street Fighter 6",
-        "World of Warcraft",
-        "XDefiant",
-    ];
+		column.appendChild(header);
+		return column;
+	}
 
-    //Method to wait for an element in the DOM
-    function waitForElement(selector, selectorAll = false) {
-        return new Promise((resolve) => {
-            //Return the element if it is already in the DOM
-            if (!selectorAll) {
-                const element = document.querySelector(selector);
-                if (element) {
-                    resolve(element);
-                }
-            } else {
-                const element = document.querySelectorAll(selector);
-                if (element.length > 0) {
-                    resolve(element);
-                }
-            }
+	// Method to clean the textarea
+	function sortAndDeduplicateTextarea(textarea) {
+		if (!textarea) return;
 
-            //Wait for the element to be in the DOM
-            const observer = new MutationObserver((mutations) => {
-                if (!selectorAll) {
-                    const element = document.querySelector(selector);
-                    if (element) {
-                        resolve(element);
-                        observer.disconnect();
-                    }
-                } else {
-                    const element = document.querySelectorAll(selector);
-                    if (element.length > 0) {
-                        resolve(element);
-                        observer.disconnect();
-                    }
-                }
-            });
+		const content = textarea.value;
 
-            //Observer settings
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-            });
-        });
-    }
+		// Split into lines, trim and filter out empties
+		const lines = content
+			.split("\n")
+			.map((line) => line.trim())
+			.filter((line) => line !== "");
 
-    //Remove the side nav bloat
-    function removeDrops() {
-        let oldHref = "";
-        const body = document.querySelector("body");
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach(() => {
-                if (oldHref !== document.location.href) {
-                    oldHref = document.location.href;
-                    if (document.location.href.includes("/drops/campaigns")) {
-                        // This will leave games not defined in either out, better that way than
-                        // missing drops of new games.
+		// Create unique map to deduplicate (it is case insensitive)
+		const uniqueMap = new Map();
+		lines.forEach((line) => {
+			uniqueMap.set(line.toLowerCase(), line);
+		});
 
-                        // Bloat
-                        waitForElement(bloatText, true).then((bloat) => {
-                            bloat.forEach((element) => {
-                                element.remove();
-                            });
-                        });
+		// Convert to array, sort it, and get original values that are not lowercased
+		const sortedUniqueLines = Array.from(uniqueMap.keys())
+			.sort()
+			.map((key) => uniqueMap.get(key));
 
-                        //Wait for the Drops
-                        waitForElement(dropsListSel, true).then((element) => {
-                            let games = [];
-                            let rewards = [];
+		textarea.value = sortedUniqueLines.join("\n") + "\n";
 
-                            // Extract the data
-                            Array.from(element).forEach((dropElement) => {
-                                // Get the title of the drop
-                                const rewardCompany =
-                                    dropElement.querySelector(
-                                        rewardsSpecificSel
-                                    )?.innerText;
-                                if (rewardCompany !== undefined) {
-                                    const game =
-                                        dropElement.querySelector(
-                                            rewardGameSelector
-                                        )?.innerText;
-                                    rewards.push([
-                                        dropElement,
-                                        game,
-                                        rewardCompany,
-                                    ]);
-                                } else {
-                                    const title =
-                                        dropElement.querySelector(
-                                            titleSelector
-                                        )?.innerText;
-                                    games.push([dropElement, title]);
-                                }
-                            });
+		// Trigger input event to update counters
+		const inputEvent = new Event("input", { bubbles: true });
+		textarea.dispatchEvent(inputEvent);
+	}
 
-                            // Remove drops for games
-                            games.forEach((game) => {
-                                // Unpack
-                                const element = game[0];
-                                const title = game[1];
+    // Add the clean button to the textarea
+	function addCleanButton(doc, textarea) {
+		const parentVar = textarea.closest(".config_var");
+		if (!parentVar) return;
 
-                                // Drops to show
-                                if (shownGames.includes(title)) {
-                                    return;
-                                }
+		const cleanButton = doc.createElement("button");
+		cleanButton.textContent = "CleanSort";
+		Object.assign(cleanButton.style, {
+			marginTop: "5px",
+			padding: "3px 8px",
+			fontSize: "0.8em",
+			display: "block",
+		});
 
-                                // Drops to remove
-                                if (dropsGames.includes(title)) {
-                                    element.remove();
-                                }
-                            });
+		cleanButton.addEventListener("click", function (e) {
+			e.preventDefault();
+			sortAndDeduplicateTextarea(textarea);
+		});
 
-                            // Remove drops for rewards
-                            rewards.forEach((reward) => {
-                                // Unpack
-                                const element = reward[0];
-                                const game = reward[1];
-                                const company = reward[2];
+		textarea.parentNode.appendChild(cleanButton);
+	}
 
-                                if (shownCompanyRewards.includes(company)) {
-                                    return;
-                                }
+	// Define the configuration
+	GM_config.init({
+		id: "ttvDropsConfig",
+		title: "Twitch Drops Only Show Interesting",
+		fields: {
+			// Use Blacklist and Whitelist to get the final list?
+			blacklistAndWhitelist: {
+				label: "Use the Blacklist and the whitelist?",
+				type: "checkbox",
+				default: false,
+			},
+			// Bloat removal
+			removeBloat: {
+				label: "Should the Bloat text be removed?",
+				type: "checkbox",
+				default: true,
+			},
+			// Games Filtering
+			gameFilterEnabled: {
+				label: "Filtering Games",
+				type: "checkbox",
+				default: true,
+			},
+			whitelistGames: {
+				label: "Games to Allow (one per line)",
+				type: "textarea",
+				default: "",
+			},
+			blacklistGames: {
+				label: "Games to Block (one per line)",
+				type: "textarea",
+				default: "",
+			},
+			// Companies Filtering
+			companyFilterEnabled: {
+				label: "Filtering Companies",
+				type: "checkbox",
+				default: true,
+			},
+			whitelistCompanies: {
+				label: "Companies to Allow (one per line)",
+				type: "textarea",
+				default: "",
+			},
+			blacklistCompanies: {
+				label: "Companies to Block (one per line)",
+				type: "textarea",
+				default: "",
+			},
+			// Rewards Filtering
+			rewardFilterEnabled: {
+				label: "Filtering Rewards",
+				type: "checkbox",
+				default: true,
+			},
+			whitelistRewards: {
+				label: "Rewards to Allow (one per line)",
+				type: "textarea",
+				default: "",
+			},
+			blacklistRewards: {
+				label: "Rewards to Block (one per line)",
+				type: "textarea",
+				default: "",
+			},
+		},
+		events: {
+			open: function (doc) {
+				// Get the config wrapper
+				const configWrapper = doc.getElementById("ttvDropsConfig_wrapper");
+				if (!configWrapper) return;
 
-                                if (shownGameRewards.includes(game)) {
-                                    return;
-                                }
+				// Find all config vars
+				const configVars = Array.from(doc.querySelectorAll(".config_var"));
+				if (configVars.length === 0) return;
 
-                                // Drops to remove
-                                if (
-                                    companyRewards.includes(company) ||
-                                    gameRewards.includes(game)
-                                ) {
-                                    element.remove();
-                                }
-                            });
-                        });
-                    }
-                }
-            });
-        });
-        observer.observe(body, { childList: true, subtree: true });
-    }
+				// Get the buttons container
+				const buttons = doc.querySelector(".saveclose_buttons");
 
-    removeDrops();
+				// Create new layout containers
+				const layoutContainer = doc.createElement("layoutContainer");
+				Object.assign(layoutContainer.style, {
+					display: "flex",
+					flexDirection: "column",
+					gap: "2%",
+					marginTop: "1%",
+				});
+
+				// General settings (first two checkboxes)
+				const generalSettings = doc.createElement("generalSettings");
+				Object.assign(generalSettings.style, {
+					display: "flex",
+					flexDirection: "row",
+					justifyContent: "center",
+					borderBottom: "1px solid #ccc",
+					paddingBottom: "15px",
+					columnGap: "3.5%",
+					marginTop: "1%",
+				});
+
+				// Columns container
+				const columnsContainer = doc.createElement("columnsContainer");
+				Object.assign(columnsContainer.style, {
+					display: "flex",
+					flexDirection: "row",
+					gap: "3.5%",
+					marginTop: "2.5%",
+					padding: "0 1.5% 0 1.5%",
+				});
+
+				// Columns Setup
+				const gamesColumn = createColumn(doc, "Games");
+				const companiesColumn = createColumn(doc, "Companies");
+				const rewardsColumn = createColumn(doc, "Rewards");
+
+				// Columns
+				columnsContainer.appendChild(gamesColumn);
+				columnsContainer.appendChild(companiesColumn);
+				columnsContainer.appendChild(rewardsColumn);
+
+				// Organize Elements
+				configVars.forEach((configVar) => {
+					const id = configVar.id;
+
+					// General settings
+					if (id.includes("blacklistAndWhitelist") || id.includes("removeBloat")) {
+						generalSettings.appendChild(configVar);
+					}
+					// Games
+					else if (id.toLowerCase().includes("game")) {
+						gamesColumn.appendChild(configVar);
+					}
+					// Companies
+					else if (id.toLowerCase().includes("compan")) {
+						companiesColumn.appendChild(configVar);
+					}
+					// Rewards
+					else if (id.toLowerCase().includes("reward")) {
+						rewardsColumn.appendChild(configVar);
+					}
+				});
+
+				// Build the layout
+				layoutContainer.appendChild(generalSettings);
+				layoutContainer.appendChild(columnsContainer);
+
+				// Clear the original container and add our new layout
+				// Get the section that contains all the config_vars
+				const configSection = doc.getElementById("ttvDropsConfig_section_0");
+				if (configSection) {
+					configSection.innerHTML = "";
+					configSection.appendChild(layoutContainer);
+					// Re-add the buttons
+					if (buttons) {
+						Object.assign(buttons.style, {
+							margin: "20px auto 0 auto",
+						});
+						configSection.appendChild(buttons);
+					}
+				}
+
+				// Apply collapsible behavior to textareas
+				const textareas = doc.querySelectorAll(".config_var > textarea");
+				textareas.forEach((textarea) => {
+					const parentVar = textarea.closest(".config_var");
+					if (!parentVar) return;
+
+					textarea.style.width = "100%";
+					textarea.style.resize = "vertical";
+
+					const label = parentVar.querySelector(".field_label");
+					if (!label) return;
+
+					// Get the total count
+					const getCount = () => textarea.value.split("\n").filter((s) => s.trim() !== "").length;
+
+					// Add toggle and count
+					const toggle = doc.createElement("span");
+					Object.assign(toggle.style, {
+						cursor: "pointer",
+						userSelect: "none",
+						marginLeft: "5px",
+						fontWeight: "bold",
+					});
+					toggle.textContent = "▼";
+
+					const countSpan = doc.createElement("span");
+					Object.assign(countSpan.style, {
+						fontSize: "0.9em",
+						color: "#666",
+						marginLeft: "5px",
+					});
+					countSpan.textContent = `(${getCount()} items)`;
+
+					label.appendChild(toggle);
+					label.appendChild(countSpan);
+
+					// Set up toggle behavior
+					label.style.cursor = "pointer";
+					label.addEventListener("click", function (e) {
+						if (e.target === textarea) return;
+
+						const isCollapsed = textarea.style.display === "none";
+						toggle.textContent = isCollapsed ? "▼" : "▶";
+
+						textarea.style.display = isCollapsed ? "block" : "none";
+					});
+
+					// Update count on input
+					textarea.addEventListener("input", function () {
+						countSpan.textContent = `(${getCount()} items)`;
+					});
+
+                    // Add the clean button to the textarea
+                    addCleanButton(doc, textarea);
+				});
+			},
+			save: function () {
+				location.reload();
+			},
+		},
+	});
+
+	// Register menu command to open config
+	GM_registerMenuCommand("Settings", function () {
+		GM_config.open();
+	});
+
+	function filterDrop(dropElement, dropText, greyListEnabled, whitelist, blacklist) {
+		// Lowercase it
+		dropText = dropText.toLowerCase();
+
+		// If whitelist and blacklist is disabled
+		if (!greyListEnabled) {
+			if (!whitelist.includes(dropText)) {
+				dropElement.remove();
+			}
+			return;
+		}
+
+		// Drops to show
+		if (whitelist.includes(dropText)) {
+			return;
+		}
+
+		// Drops to remove
+		if (blacklist.includes(dropText)) {
+			dropElement.remove();
+		}
+	}
+
+	function extractListData(rawTextArea) {
+		return rawTextArea
+			.split("\n")
+			.filter((s) => s.trim() !== "")
+			.map((s) => s.toLowerCase());
+	}
+
+	//Remove the side nav bloat
+	function removeDrops() {
+		let oldHref = "";
+		const body = document.querySelector("body");
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach(() => {
+				if (oldHref !== document.location.href) {
+					oldHref = document.location.href;
+					if (document.location.href.includes("/drops/campaigns")) {
+						// This will leave games not defined in either out, better that way than
+						// missing drops of new games.
+
+						// Get the settings
+						const greyListEnabled = GM_config.get("blacklistAndWhitelist");
+						const bloatRemove = GM_config.get("removeBloat");
+
+						// Game settings
+						const gameFilterEnabled = GM_config.get("gameFilterEnabled");
+						const whitelistGames = extractListData(GM_config.get("whitelistGames"));
+						const blacklistGames = extractListData(GM_config.get("blacklistGames"));
+
+						// Company settings
+						const companyFilterEnabled = GM_config.get("companyFilterEnabled");
+						const whitelistCompanies = extractListData(GM_config.get("whitelistCompanies"));
+						const blacklistCompanies = extractListData(GM_config.get("blacklistCompanies"));
+
+						// Reward settings
+						const rewardFilterEnabled = GM_config.get("rewardFilterEnabled");
+						const whitelistRewards = extractListData(GM_config.get("whitelistRewards"));
+						const blacklistRewards = extractListData(GM_config.get("blacklistRewards"));
+
+						// Bloat
+						if (bloatRemove) {
+							waitForElement(bloatText, true).then((bloat) => {
+								bloat.forEach((element) => {
+									element.remove();
+								});
+							});
+						}
+
+						//Wait for the Drops
+						waitForElement(dropsListSel, true).then((element) => {
+							let games = [];
+							let rewards = [];
+
+							// Extract the data
+							Array.from(element).forEach((dropElement) => {
+								// Get the title of the drop
+								const rewardGame =
+									dropElement.querySelector(rewardsSpecificSel)?.innerText;
+								if (rewardGame !== undefined) {
+									const company = dropElement.querySelector(rewardCompanySelector)?.innerText;
+									rewards.push([dropElement, rewardGame, company]);
+								} else {
+									const title = dropElement.querySelector(titleSelector)?.innerText;
+									games.push([dropElement, title]);
+								}
+							});
+
+							// Remove drops for games
+							if (gameFilterEnabled) {
+								games.forEach((game) => {
+									// Unpack
+									const element = game[0];
+									const title = game[1];
+
+									// Game Filtering
+									filterDrop(
+										element,
+										title,
+										greyListEnabled,
+										whitelistGames,
+										blacklistGames
+									);
+								});
+							}
+
+							// Remove drops for rewards
+							rewards.forEach((reward) => {
+								// Unpack
+								const element = reward[0];
+								const game = reward[1];
+								const company = reward[2];
+
+								// Rewards Filtering
+								if (companyFilterEnabled) {
+									filterDrop(
+										element,
+										company,
+										greyListEnabled,
+										whitelistCompanies,
+										blacklistCompanies
+									);
+								}
+
+								if (rewardFilterEnabled) {
+									filterDrop(
+										element,
+										game,
+										greyListEnabled,
+										whitelistRewards,
+										blacklistRewards
+									);
+								}
+							});
+						});
+					}
+				}
+			});
+		});
+		observer.observe(body, { childList: true, subtree: true });
+	}
+
+	removeDrops();
 })();
