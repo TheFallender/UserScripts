@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.3.0
+// @version      1.3.1
 // @description  A script that hides the drops not interesting to the user
 // @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
@@ -76,6 +76,9 @@
 	function createColumn(doc, title) {
 		const column = doc.createElement("column");
 		Object.assign(column.style, {
+			display: "flex",
+			flexDirection: "column",
+			gap: "10px",
 			flex: "1",
 			padding: "10px",
 			border: "1px solid #ddd",
@@ -133,10 +136,11 @@
 		const cleanButton = doc.createElement("button");
 		cleanButton.textContent = "CleanSort";
 		Object.assign(cleanButton.style, {
+			display: "inline",
 			marginTop: "5px",
-			padding: "3px 8px",
+			margin: "5px 5px 5px 0",
+			padding: "3px 5px",
 			fontSize: "0.8em",
-			display: "block",
 		});
 
 		cleanButton.addEventListener("click", function (e) {
@@ -144,7 +148,8 @@
 			sortAndDeduplicateTextarea(textarea);
 		});
 
-		textarea.parentNode.appendChild(cleanButton);
+		// Append before the textarea
+		textarea.parentNode.insertBefore(cleanButton, textarea);
 	}
 
 	// Define the configuration
@@ -224,7 +229,8 @@
 				if (configVars.length === 0) return;
 
 				// Get the buttons container
-				const buttons = doc.querySelector(".saveclose_buttons");
+				const buttons = Array.from(doc.querySelectorAll(".saveclose_buttons"));
+				buttons.push(doc.querySelector(".reset_holder"));
 
 				// Create new layout containers
 				const layoutContainer = doc.createElement("layoutContainer");
@@ -242,7 +248,7 @@
 					flexDirection: "row",
 					justifyContent: "center",
 					borderBottom: "1px solid #ccc",
-					paddingBottom: "15px",
+					paddingBottom: "1%",
 					columnGap: "3.5%",
 					marginTop: "1%",
 				});
@@ -253,7 +259,7 @@
 					display: "flex",
 					flexDirection: "row",
 					gap: "3.5%",
-					marginTop: "2.5%",
+					marginTop: "2%",
 					padding: "0 1.5% 0 1.5%",
 				});
 
@@ -300,12 +306,15 @@
 					configSection.innerHTML = "";
 					configSection.appendChild(layoutContainer);
 					// Re-add the buttons
-					if (buttons) {
-						Object.assign(buttons.style, {
-							margin: "20px auto 0 auto",
+					buttons.forEach((button) => {
+						Object.assign(button.style, {
+							margin: "10px 10px 0px",
 						});
-						configSection.appendChild(buttons);
-					}
+						configSection.appendChild(button);
+					})
+
+					// Display Inline for Restore Button
+					doc.querySelector(".reset_holder").style.display = "inline";
 				}
 
 				// Apply collapsible behavior to textareas
@@ -315,6 +324,7 @@
 					if (!parentVar) return;
 
 					textarea.style.width = "100%";
+					textarea.style.height = "18vh";
 					textarea.style.resize = "vertical";
 
 					const label = parentVar.querySelector(".field_label");
@@ -346,6 +356,8 @@
 
 					// Set up toggle behavior
 					label.style.cursor = "pointer";
+					label.style.display = "inline";
+					label.style.userSelect = "none";
 					label.addEventListener("click", function (e) {
 						if (e.target === textarea) return;
 
