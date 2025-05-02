@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steam Short Share
 // @author       TheFallender
-// @version      1.0.3
+// @version      1.0.4
 // @description  Will replace the links of sharing with the s.team/a/<id> format
 // @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/SteamShortShare/SteamShortShare.user.js
@@ -86,7 +86,14 @@
 
         const targetDiv = document.querySelector('#queueActionsCtn > div[style="clear: both;"]');
 
+        // Add the whitespace before
+        targetDiv.parentNode.insertBefore(document.createTextNode("\n"), targetDiv);
+
+        // Add the button and the click
         let finalShareButton = targetDiv.parentNode.insertBefore(queueBtnShare, targetDiv);
         finalShareButton.onclick = (event) => { navigator.clipboard.writeText(`https://s.team/a/${gameId}`); };
+
+        // Add the whitespace after
+        targetDiv.parentNode.insertBefore(document.createTextNode("\n"), targetDiv);
     });
 })();
