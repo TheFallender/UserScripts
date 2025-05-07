@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.3.1
+// @version      1.3.2
 // @description  A script that hides the drops not interesting to the user
 // @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
@@ -27,9 +27,6 @@
 	// Selector of data of the drops/rewards
 	const titleSelector = ".accordion-header .tw-title";
 	const rewardCompanySelector = ".accordion-header .tw-title ~ p";
-
-	// Bloat on the drops
-	const bloatText = ".drops-root__content > div >div:has(span > .tw-link)";
 
 	//Method to wait for an element in the DOM
 	function waitForElement(selector, selectorAll = false) {
@@ -163,12 +160,6 @@
 				type: "checkbox",
 				default: false,
 			},
-			// Bloat removal
-			removeBloat: {
-				label: "Should the Bloat text be removed?",
-				type: "checkbox",
-				default: true,
-			},
 			// Games Filtering
 			gameFilterEnabled: {
 				label: "Filtering Games",
@@ -278,7 +269,7 @@
 					const id = configVar.id;
 
 					// General settings
-					if (id.includes("blacklistAndWhitelist") || id.includes("removeBloat")) {
+					if (id.includes("blacklistAndWhitelist")) {
 						generalSettings.appendChild(configVar);
 					}
 					// Games
@@ -417,7 +408,7 @@
 			.map((s) => s.toLowerCase());
 	}
 
-	//Remove the side nav bloat
+	//Remove the drops
 	function removeDrops() {
 		let oldHref = "";
 		const body = document.querySelector("body");
@@ -431,7 +422,6 @@
 
 						// Get the settings
 						const greyListEnabled = GM_config.get("blacklistAndWhitelist");
-						const bloatRemove = GM_config.get("removeBloat");
 
 						// Game settings
 						const gameFilterEnabled = GM_config.get("gameFilterEnabled");
@@ -447,15 +437,6 @@
 						const rewardFilterEnabled = GM_config.get("rewardFilterEnabled");
 						const whitelistRewards = extractListData(GM_config.get("whitelistRewards"));
 						const blacklistRewards = extractListData(GM_config.get("blacklistRewards"));
-
-						// Bloat
-						if (bloatRemove) {
-							waitForElement(bloatText, true).then((bloat) => {
-								bloat.forEach((element) => {
-									element.remove();
-								});
-							});
-						}
 
 						//Wait for the Drops
 						waitForElement(dropsListSel, true).then((element) => {
