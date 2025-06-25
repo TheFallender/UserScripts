@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.3.2
+// @version      1.3.3
 // @description  A script that hides the drops not interesting to the user
 // @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
@@ -25,8 +25,8 @@
 	const rewardsSpecificSel = '.tw-link[href*="/directory/category/"]';
 
 	// Selector of data of the drops/rewards
-	const titleSelector = ".accordion-header .tw-title";
-	const rewardCompanySelector = ".accordion-header .tw-title ~ p";
+	const titleSelector = ".accordion-header div > p:first-child";
+	const rewardCompanySelector = ".accordion-header div > p:last-child";
 
 	//Method to wait for an element in the DOM
 	function waitForElement(selector, selectorAll = false) {
