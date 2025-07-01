@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name         Itch.io Bundle Claim
 // @author       TheFallender
-// @version      1.5.3
+// @version      1.5.4
 // @description  This script will claim all the items in a bundle slowly, without sending too many requests to the website
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/ItchioBundleClaim/ItchIoBundleClaim.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/ItchioBundleClaim/ItchIoBundleClaim.user.js
-// @supportURL   https://github.com/TheFallender/TamperMonkeyScripts
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/ItchioBundleClaim/ItchIoBundleClaim.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/ItchioBundleClaim/ItchIoBundleClaim.user.js
+// @supportURL   https://github.com/TheFallender/UserScripts
 // @match        https://itch.io/bundle/download/*
 // @match        https://*.itch.io/*/download/*
 // @icon         https://www.google.com/s2/favicons?domain=itch.io
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
+// @require      https://raw.githubusercontent.com/TheFallender/UserScripts/master/_Shared/WaitForElement.js
 // @grant        none
 // ==/UserScript==
 
@@ -32,30 +32,6 @@
 
     //Game row selector
     let gameRowSelector = "button[value='claim']"
-
-    //Method to wait for an element in the DOM
-    function waitForElement(selector) {
-        return new Promise(resolve => {
-            //Return the element if it is already in the DOM
-            if (document.querySelector(selector)) {
-                return resolve(document.querySelector(selector));
-            }
-
-            //Wait for the element to be in the DOM
-            const observer = new MutationObserver(mutations => {
-                if (document.querySelector(selector)) {
-                    resolve(document.querySelector(selector));
-                    observer.disconnect();
-                }
-            });
-
-            //Observer settings
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
-    }
 
     //Timeout for each transition
     setTimeout(function () {

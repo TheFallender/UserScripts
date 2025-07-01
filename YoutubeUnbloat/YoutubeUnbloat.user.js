@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         Youtube Hide Titles and Streams (WIP)
 // @author       TheFallender
-// @version      0.1.0
+// @version      0.1.1
 // @description  A script that hides the titles and streams that the user may not be interested in.
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/YoutubeUnbloat/YoutubeUnbloat.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/YoutubeUnbloat/YoutubeUnbloat.user.js
-// @supportURL   https://github.com/TheFallender/TamperMonkeyScripts
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/YoutubeUnbloat/YoutubeUnbloat.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/YoutubeUnbloat/YoutubeUnbloat.user.js
+// @supportURL   https://github.com/TheFallender/UserScripts
 // @match        https://www.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?domain=youtube.com
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
+// @require      https://raw.githubusercontent.com/TheFallender/UserScripts/master/_Shared/WaitForElement.js
 // @grant        none
 // ==/UserScript==
 
@@ -50,47 +50,6 @@
             "titles": []
         },
     };
-
-    //Method to wait for an element in the DOM
-    function waitForElement(selector, selectorAll = false) {
-        return new Promise(resolve => {
-            //Return the element if it is already in the DOM
-            if (!selectorAll) {
-                const element = document.querySelector(selector);
-                if (element) {
-                    resolve(element);
-                }
-            } else {
-                const element = document.querySelectorAll(selector);
-                if (element.length > 0) {
-                    resolve(element);
-                }
-            }
-
-            //Wait for the element to be in the DOM
-            const observer = new MutationObserver(mutations => {
-                if (!selectorAll) {
-                    const element = document.querySelector(selector);
-                    if (element) {
-                        resolve(element);
-                        observer.disconnect();
-                    }
-                } else {
-                    const element = document.querySelectorAll(selector);
-                    if (element.length > 0) {
-                        resolve(element);
-                        observer.disconnect();
-                    }
-                }
-            });
-
-            //Observer settings
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
-    }
 
     function removeBloat () {
         let oldHref = "";

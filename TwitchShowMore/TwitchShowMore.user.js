@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         Twitch Show More
 // @author       TheFallender
-// @version      1.9.4
+// @version      1.9.5
 // @description  A script that will show all your streammers and hide the bloat
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchShowMore/TwitchShowMore.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchShowMore/TwitchShowMore.user.js
-// @supportURL   https://github.com/TheFallender/TamperMonkeyScripts
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchShowMore/TwitchShowMore.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchShowMore/TwitchShowMore.user.js
+// @supportURL   https://github.com/TheFallender/UserScripts
 // @match        https://www.twitch.tv/*
 // @icon         https://www.google.com/s2/favicons?domain=twitch.tv
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
+// @require      https://raw.githubusercontent.com/TheFallender/UserScripts/master/_Shared/WaitForElement.js
 // @grant        none
 // ==/UserScript==
 
@@ -23,30 +23,6 @@
     // Sleep method for easier use
     function sleep (msTime) {
         return new Promise(r => setTimeout(r, msTime));
-    }
-
-    //Method to wait for an element in the DOM
-    function waitForElement(selector) {
-        return new Promise(resolve => {
-            //Return the element if it is already in the DOM
-            if (document.querySelector(selector)) {
-                return resolve(document.querySelector(selector));
-            }
-
-            //Wait for the element to be in the DOM
-            const observer = new MutationObserver(mutations => {
-                if (document.querySelector(selector)) {
-                    resolve(document.querySelector(selector));
-                    observer.disconnect();
-                }
-            });
-
-            //Observer settings
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
     }
 
     //Remove the side nav bloat

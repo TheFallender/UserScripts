@@ -1,20 +1,20 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.3.3
+// @version      1.3.4
 // @description  A script that hides the drops not interesting to the user
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
-// @supportURL   https://github.com/TheFallender/TamperMonkeyScripts
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
+// @supportURL   https://github.com/TheFallender/UserScripts
 // @match        https://www.twitch.tv/*
 // @icon         https://www.google.com/s2/favicons?domain=twitch.tv
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
 // @require      https://openuserjs.org/src/libs/sizzle/GM_config.js
+// @require      https://raw.githubusercontent.com/TheFallender/UserScripts/master/_Shared/WaitForElement.js
 // ==/UserScript==
 
 (function () {
@@ -27,47 +27,6 @@
 	// Selector of data of the drops/rewards
 	const titleSelector = ".accordion-header div > p:first-child";
 	const rewardCompanySelector = ".accordion-header div > p:last-child";
-
-	//Method to wait for an element in the DOM
-	function waitForElement(selector, selectorAll = false) {
-		return new Promise((resolve) => {
-			//Return the element if it is already in the DOM
-			if (!selectorAll) {
-				const element = document.querySelector(selector);
-				if (element) {
-					resolve(element);
-				}
-			} else {
-				const element = document.querySelectorAll(selector);
-				if (element.length > 0) {
-					resolve(element);
-				}
-			}
-
-			//Wait for the element to be in the DOM
-			const observer = new MutationObserver((mutations) => {
-				if (!selectorAll) {
-					const element = document.querySelector(selector);
-					if (element) {
-						resolve(element);
-						observer.disconnect();
-					}
-				} else {
-					const element = document.querySelectorAll(selector);
-					if (element.length > 0) {
-						resolve(element);
-						observer.disconnect();
-					}
-				}
-			});
-
-			//Observer settings
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true,
-			});
-		});
-	}
 
 	// Helper function to create a column
 	function createColumn(doc, title) {

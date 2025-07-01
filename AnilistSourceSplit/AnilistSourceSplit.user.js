@@ -1,17 +1,16 @@
 // ==UserScript==
 // @name         Anilist Source Split
 // @author       TheFallender
-// @version      1.0.0
+// @version      1.0.1
 // @description  Will split the source list into anime, manga, and light novels and put the most relevant at the top
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/AnilistSourceSplit/AnilistSourceSplit.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/AnilistSourceSplit/AnilistSourceSplit.user.js
-// @supportURL   https://github.com/TheFallender/TamperMonkeyScripts
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/AnilistSourceSplit/AnilistSourceSplit.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/AnilistSourceSplit/AnilistSourceSplit.user.js
+// @supportURL   https://github.com/TheFallender/UserScripts
 // @match        https://anilist.co/*/*/*
-// @require      https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/_Shared/WaitForElement.js
 // @icon         https://www.google.com/s2/favicons?domain=anilist.co
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
+// @require      https://raw.githubusercontent.com/TheFallender/UserScripts/master/_Shared/WaitForElement.js
 // @grant        none
 // ==/UserScript==
 
@@ -159,7 +158,7 @@
                     oldHref = document.location.href;
 
                     // Get the content type
-                    waitForElement(contentTypeSel, null, true).then((dataSets) => {
+                    waitForElementCallback(contentTypeSel, null, true).then((dataSets) => {
                         // Get the content type
                         contentType = getValueByType(dataSets, "Format");
 
@@ -177,7 +176,7 @@
 						}
 
                         // Wait for the source list
-                        waitForElement(sourceListSel).then((element) =>
+                        waitForElementCallback(sourceListSel).then((element) =>
                             rebuildSources(element)
                         );
                     });

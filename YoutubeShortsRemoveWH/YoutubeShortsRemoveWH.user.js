@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name         Youtube Shorts - Remove from WH
 // @author       TheFallender
-// @version      1.3.2
+// @version      1.3.3
 // @description  This script will remove all the Shorts watched in your watch history.
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/YoutubeShortsRemoveWH/YoutubeShortsRemoveWH.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/YoutubeShortsRemoveWH/YoutubeShortsRemoveWH.user.js
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/YoutubeShortsRemoveWH/YoutubeShortsRemoveWH.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/YoutubeShortsRemoveWH/YoutubeShortsRemoveWH.user.js
 // @match        https://*.youtube.com/feed/history
 // @icon         https://www.google.com/s2/favicons?domain=youtube.com
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
 // @require      http://code.jquery.com/jquery-3.6.0.min.js
 // @require      http://code.jquery.com/ui/1.12.1/jquery-ui.min.js
+// @require      https://raw.githubusercontent.com/TheFallender/UserScripts/master/_Shared/WaitForElement.js
 // @grant        none
 // ==/UserScript==
 
@@ -36,30 +36,6 @@
     const selMenuRemove = "div.tp-yt-iron-dropdown ytd-menu-service-item-renderer";
     const selPostToasts = "tp-yt-paper-toast#toast";
     const selUnloadedVideos = "ytd-video-renderer:not(:has(div#overlays ytd-thumbnail-overlay-time-status-renderer))";
-
-    // Method to wait for an element in the DOM
-    function waitForElement(selector) {
-        return new Promise(resolve => {
-            // Return the element if it is already in the DOM
-            if (document.querySelector(selector)) {
-                return resolve(document.querySelector(selector));
-            }
-
-            // Wait for the element to be in the DOM
-            const observer = new MutationObserver(mutations => {
-                if (document.querySelector(selector)) {
-                    resolve(document.querySelector(selector));
-                    observer.disconnect();
-                }
-            });
-
-            // Observer settings
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
-    }
 
     // Sleep method for easier use
     function sleep (msTime) {

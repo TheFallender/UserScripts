@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         Udemy Show More
 // @author       TheFallender
-// @version      1.4.2
+// @version      1.4.3
 // @description  A script that will show all your elements in your collections.
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/UdemyShowMore/UdemyShowMore.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/UdemyShowMore/UdemyShowMore.user.js
-// @supportURL   https://github.com/TheFallender/TamperMonkeyScripts
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/UdemyShowMore/UdemyShowMore.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/UdemyShowMore/UdemyShowMore.user.js
+// @supportURL   https://github.com/TheFallender/UserScripts
 // @match        https://www.udemy.com/home/my-courses/lists*
 // @icon         https://www.google.com/s2/favicons?domain=udemy.com
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
+// @require      https://raw.githubusercontent.com/TheFallender/UserScripts/master/_Shared/WaitForElement.js
 // @grant        none
 // ==/UserScript==
 
@@ -23,30 +23,6 @@
     //Ratings
     const removeRatings = true;
     const ratingsSelector = 'button[data-purpose="review-button"]';
-
-    //Method to wait for an element in the DOM
-    function waitForElement(selector) {
-        return new Promise(resolve => {
-            //Return the element if it is already in the DOM
-            if (document.querySelector(selector)) {
-                return resolve(document.querySelector(selector));
-            }
-
-            //Wait for the element to be in the DOM
-            const observer = new MutationObserver(mutations => {
-                if (document.querySelector(selector)) {
-                    resolve(document.querySelector(selector));
-                    observer.disconnect();
-                }
-            });
-
-            //Observer settings
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
-    }
 
     //Wait until the load more courses button is loaded
     waitForElement(loadMoreCourses).then((element) => {

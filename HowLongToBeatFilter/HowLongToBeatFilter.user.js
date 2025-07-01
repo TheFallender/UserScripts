@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name         HowLongToBeat filter
 // @author       TheFallender
-// @version      1.0.4
+// @version      1.0.5
 // @description  A script that filters the games on HowLongToBeat by years or score.
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/HowLongToBeatFilter/HowLongToBeatFilter.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/HowLongToBeatFilter/HowLongToBeatFilter.user.js
-// @supportURL   https://github.com/TheFallender/TamperMonkeyScripts
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/HowLongToBeatFilter/HowLongToBeatFilter.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/HowLongToBeatFilter/HowLongToBeatFilter.user.js
+// @supportURL   https://github.com/TheFallender/UserScripts
 // @match        https://howlongtobeat.com/*
 // @icon         https://www.google.com/s2/favicons?domain=howlongtobeat.com
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
+// @require      https://raw.githubusercontent.com/TheFallender/UserScripts/master/_Shared/WaitForElement.js
 // @grant        none
 // ==/UserScript==
 
@@ -22,48 +22,6 @@
     const gameListHeaderSel = "div.table_head[class*='UserGameList_header']";
     const gameListInfoSel = "div.mobile_hide:has(select)";
     const gameListRandomSel = "button[aria-label='Random']";
-
-    //Method to wait for an element in the DOM
-    function waitForElement(selector, selectorAll = false, minimum_elements = 0) {
-        return new Promise(resolve => {
-            function conditionsSuccess() {
-                let queryResult = null
-                if (!selectorAll) {
-                    const singleElement = document.querySelector(selector);
-                    if (singleElement) {
-                        queryResult = singleElement;
-                    }
-                } else {
-                    const multipleElements = document.querySelectorAll(selector);
-                    if (multipleElements.length > 0 && multipleElements.length >= minimum_elements) {
-                        queryResult = multipleElements;
-                    }
-                }
-                return queryResult;
-            }
-
-            //Return the element if it is already in the DOM
-            const domCheck = conditionsSuccess()
-            if (domCheck) {
-                resolve(domCheck)
-            }
-
-            //Wait for the element to be in the DOM
-            const observer = new MutationObserver(mutations => {
-                //Return the element if it is already in the DOM
-                const mutationCheck = conditionsSuccess()
-                if (mutationCheck) {
-                    resolve(mutationCheck)
-                }
-            });
-
-            //Observer settings
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
-    }
 
     //Method to filter the games
     function filterGames() {

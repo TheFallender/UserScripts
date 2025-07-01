@@ -2,14 +2,13 @@
 // @name         Melvor Idle Combat Hotkeys
 // @description  This script will allow you to switch between combat sets with the numpad keys
 // @author       TheFallender
-// @version      1.0.0
-// @homepageURL  https://github.com/TheFallender/TamperMonkeyScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/MelvorIdleCombatKeys/MelvorIdleCombatKeys.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/TamperMonkeyScripts/master/MelvorIdleCombatKeys/MelvorIdleCombatKeys.user.js
+// @version      1.0.1
+// @homepageURL  https://github.com/TheFallender/UserScripts
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/MelvorIdleCombatKeys/MelvorIdleCombatKeys.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/MelvorIdleCombatKeys/MelvorIdleCombatKeys.user.js
 // @match        https://melvoridle.com/index_game.php
 // @icon         https://www.google.com/s2/favicons?domain=melvoridle.com
 // @license      MIT
-// @copyright    Copyright © 2024 TheFallender
 // @grant        none
 // ==/UserScript==
 
