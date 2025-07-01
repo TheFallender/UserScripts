@@ -4,8 +4,8 @@
 // @version      1.0.1
 // @description  It will unmute/refresh automatically all Twitch Streams so the Drops are obtainable
 // @homepageURL  https://github.com/TheFallender/UserScripts
-// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchAutoUnmute/TwitchAutoUnmute.user.js
-// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchAutoUnmute/TwitchAutoUnmute.user.js
+// @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchAutoFix/TwitchAutoFix.user.js
+// @downloadURL  https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchAutoFix/TwitchAutoFix.user.js
 // @supportURL   https://github.com/TheFallender/UserScripts
 // @match        https://www.twitch.tv/*
 // @icon         https://www.google.com/s2/favicons?domain=twitch.tv
