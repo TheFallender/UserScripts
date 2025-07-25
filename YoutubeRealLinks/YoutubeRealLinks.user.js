@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Youtube Real Links
 // @author       TheFallender
-// @version      1.0.3
+// @version      1.0.4
 // @description  Will replace the links with the actual content, not the Youtube Redirect
 // @homepageURL  https://github.com/TheFallender/UserScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/YoutubeRealLinks/YoutubeRealLinks.user.js
@@ -18,19 +18,18 @@
 	"use strict";
 
 	// Selectors
-	const descriptionLinksSel =
-        "#description-inline-expander .yt-core-attributed-string__link";
+	const descriptionLinksSel = 
+		"#description-inline-expander .yt-core-attributed-string__link";
 	const descriptionExpandedLinksSel =
 		"#description-inline-expander[is-expanded] .yt-core-attributed-string__link";
-    const ytMetadataSel = "ytd-watch-metadata";
+	const ytMetadataSel = "ytd-watch-metadata";
 
-    // Variables
-    let isDescriptionPromiseRunning = false;
+	// Variables
+	let isDescriptionPromiseRunning = false;
 	let isDescriptionExpandedPromiseRunning = false;
 
 	//Links replacement
 	function replaceLinks(elements) {
-		console.log("Cleanup started!");
 		Array.from(elements).forEach((element) => {
 			const elemURL = new URL(element.href);
 			if (
@@ -50,11 +49,18 @@
 		});
 	}
 
+	// Sleep function
+	function sleep(ms) {
+		return new Promise((resolve) => {
+			setTimeout(resolve, ms);
+		});
+	}
+
 	// Observe video ID changes
 	function observeVideoIdChange(targetElement, callback) {
-
 		const observer = new MutationObserver((mutations) => {
-			mutations.forEach((mutation) => {
+			mutations.forEach(async (mutation) => {
+				await sleep(1000);
 				callback();
 			});
 		});
@@ -67,9 +73,8 @@
 		return observer;
 	}
 
-    function setupWaitPromises() {
+	function setupWaitPromises() {
 		if (!isDescriptionPromiseRunning) {
-			console.log("Setting up the Description promise ");
 			isDescriptionPromiseRunning = true;
 			waitForElement(descriptionLinksSel, true).then((elements) => {
 				replaceLinks(elements);
@@ -78,16 +83,13 @@
 		}
 
 		if (!isDescriptionExpandedPromiseRunning) {
-			console.log("Setting up the Description Expanded promise ");
 			isDescriptionExpandedPromiseRunning = true;
 			waitForElement(descriptionExpandedLinksSel, true).then((elements) => {
 				replaceLinks(elements);
 				isDescriptionExpandedPromiseRunning = false;
 			});
 		}
-    }
+	}
 
-    waitForElement(ytMetadataSel).then((element) =>
-        observeVideoIdChange(element, setupWaitPromises)
-    );
+	waitForElement(ytMetadataSel).then((element) => observeVideoIdChange(element, setupWaitPromises));
 })();
