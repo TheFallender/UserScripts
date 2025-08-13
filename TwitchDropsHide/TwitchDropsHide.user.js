@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.3.4
+// @version      1.3.5
 // @description  A script that hides the drops not interesting to the user
 // @homepageURL  https://github.com/TheFallender/UserScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
@@ -37,9 +37,9 @@
 			gap: "10px",
 			flex: "1",
 			padding: "10px",
-			border: "1px solid #ddd",
+			border: "1px solid #bbb",
 			borderRadius: "5px",
-			backgroundColor: "#f9f9f9",
+			backgroundColor: "rgba(25, 25, 25, 0.85)",
 		});
 
 		const header = doc.createElement("h3");
@@ -84,7 +84,7 @@
 		textarea.dispatchEvent(inputEvent);
 	}
 
-    // Add the clean button to the textarea
+	// Add the clean button to the textarea
 	function addCleanButton(doc, textarea) {
 		const parentVar = textarea.closest(".config_var");
 		if (!parentVar) return;
@@ -170,6 +170,12 @@
 		},
 		events: {
 			open: function (doc) {
+				// Set background color
+				Object.assign(doc.activeElement.style, {
+					color: "rgb(230, 230, 230)",
+					backgroundColor: "rgba(30, 30, 30, 0.8)",
+				});
+
 				// Get the config wrapper
 				const configWrapper = doc.getElementById("ttvDropsConfig_wrapper");
 				if (!configWrapper) return;
@@ -261,10 +267,11 @@
 							margin: "10px 10px 0px",
 						});
 						configSection.appendChild(button);
-					})
+					});
 
 					// Display Inline for Restore Button
 					doc.querySelector(".reset_holder").style.display = "inline";
+					doc.querySelector("#ttvDropsConfig_resetLink").style.color = "rgb(230, 230, 230)";
 				}
 
 				// Apply collapsible behavior to textareas
@@ -276,6 +283,8 @@
 					textarea.style.width = "100%";
 					textarea.style.height = "18vh";
 					textarea.style.resize = "vertical";
+					textarea.style.backgroundColor = "rgba(23, 23, 23, 0.0)";
+					textarea.style.color = "rgb(230, 230, 230)";
 
 					const label = parentVar.querySelector(".field_label");
 					if (!label) return;
@@ -296,7 +305,7 @@
 					const countSpan = doc.createElement("span");
 					Object.assign(countSpan.style, {
 						fontSize: "0.9em",
-						color: "#666",
+						color: "rgb(230, 230, 230)",
 						marginLeft: "5px",
 					});
 					countSpan.textContent = `(${getCount()} items)`;
@@ -322,8 +331,8 @@
 						countSpan.textContent = `(${getCount()} items)`;
 					});
 
-                    // Add the clean button to the textarea
-                    addCleanButton(doc, textarea);
+					// Add the clean button to the textarea
+					addCleanButton(doc, textarea);
 				});
 			},
 			save: function () {
@@ -405,10 +414,10 @@
 							// Extract the data
 							Array.from(element).forEach((dropElement) => {
 								// Get the title of the drop
-								const rewardGame =
-									dropElement.querySelector(rewardsSpecificSel)?.innerText;
+								const rewardGame = dropElement.querySelector(rewardsSpecificSel)?.innerText;
 								if (rewardGame !== undefined) {
-									const company = dropElement.querySelector(rewardCompanySelector)?.innerText;
+									const company =
+										dropElement.querySelector(rewardCompanySelector)?.innerText;
 									rewards.push([dropElement, rewardGame, company]);
 								} else {
 									const title = dropElement.querySelector(titleSelector)?.innerText;
@@ -429,7 +438,7 @@
 										title,
 										greyListEnabled,
 										whitelistGames,
-										blacklistGames
+										blacklistGames,
 									);
 								});
 							}
@@ -448,7 +457,7 @@
 										company,
 										greyListEnabled,
 										whitelistCompanies,
-										blacklistCompanies
+										blacklistCompanies,
 									);
 								}
 
@@ -458,7 +467,7 @@
 										game,
 										greyListEnabled,
 										whitelistRewards,
-										blacklistRewards
+										blacklistRewards,
 									);
 								}
 							});
