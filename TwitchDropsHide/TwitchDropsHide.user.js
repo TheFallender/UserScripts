@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Drops only show interesting
 // @author       TheFallender
-// @version      1.3.5
+// @version      1.3.6
 // @description  A script that hides the drops not interesting to the user
 // @homepageURL  https://github.com/TheFallender/UserScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/TwitchDropsHide/TwitchDropsHide.user.js
@@ -19,6 +19,11 @@
 
 (function () {
 	"use strict";
+
+	// Closed drops selectors
+	const openDropsSel = ".drops-root__content > :nth-child(2)";
+	const closedDropsHeaderSel = ".drops-root__content > :nth-child(3)";
+	const closedDropsSel = ".drops-root__content > :nth-child(4)";
 
 	// List selectors of drops and rewards
 	const dropsListSel = ".drops-root__content div:has(> .accordion-header)";
@@ -118,6 +123,12 @@
 				label: "Use the Blacklist and the whitelist?",
 				type: "checkbox",
 				default: false,
+			},
+			// Closed Drops
+			closedDropsRemovalEnabled: {
+				label: "Hide Closed Drops",
+				type: "checkbox",
+				default: true,
 			},
 			// Games Filtering
 			gameFilterEnabled: {
@@ -234,7 +245,7 @@
 					const id = configVar.id;
 
 					// General settings
-					if (id.includes("blacklistAndWhitelist")) {
+					if (id.includes("blacklistAndWhitelist") || id.includes("closedDropsRemovalEnabled")) {
 						generalSettings.appendChild(configVar);
 					}
 					// Games
@@ -406,10 +417,27 @@
 						const whitelistRewards = extractListData(GM_config.get("whitelistRewards"));
 						const blacklistRewards = extractListData(GM_config.get("blacklistRewards"));
 
+						// Closed drops settings
+						const closedDropsRemovalEnabled = GM_config.get("closedDropsRemovalEnabled");
+
 						//Wait for the Drops
 						waitForElement(dropsListSel, true).then((element) => {
 							let games = [];
 							let rewards = [];
+
+							// Remove closed drops
+							let bottomSelector = closedDropsSel;
+							if (closedDropsRemovalEnabled) {
+								const header = document.querySelector(closedDropsHeaderSel);
+								const closed = document.querySelector(closedDropsSel);
+								if (header) header.remove();
+								if (closed) closed.remove();
+
+								bottomSelector = openDropsSel;
+							}
+
+							// Pad the container
+							document.querySelector(bottomSelector).style.paddingBottom = "8vh";
 
 							// Extract the data
 							Array.from(element).forEach((dropElement) => {
