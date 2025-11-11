@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Steam Short Share
 // @author       TheFallender
-// @version      1.0.5
+// @version      1.0.6
 // @description  Will replace the links of sharing with the s.team/a/<id> format
 // @homepageURL  https://github.com/TheFallender/UserScripts
 // @updateURL    https://raw.githubusercontent.com/TheFallender/UserScripts/master/SteamShortShare/SteamShortShare.user.js
@@ -20,7 +20,7 @@
     // Selectors
     const shareButtonSel = '#queueActionsCtn > div';
     const gameId = document.location.pathname.match(/\/app\/(\d+)\//)[1];
-    
+
     //Replace share links
     waitForElement(shareButtonSel, false).then((element) => {
         // Outer Div
@@ -43,7 +43,7 @@
         innerDiv.appendChild(spanElement);
         queueBtnShare.appendChild(innerDiv);
 
-        const targetDiv = document.querySelector('#queueActionsCtn > div[style="clear: both;"]');
+        const targetDiv = document.querySelector('#queueActionsCtn > .expand_to_fill');
 
         // Add the whitespace before
         targetDiv.parentNode.insertBefore(document.createTextNode("\n"), targetDiv);
